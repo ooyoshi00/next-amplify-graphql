@@ -1,0 +1,15 @@
+projects:
+  nextjs-trial-todo-api:
+    schemaPath: src/graphql/schema.json
+    includes:
+      - src/graphql/**/*.js
+    excludes:
+      - ./amplify/**
+    extensions:
+      amplify:
+        codeGenTarget: javascript
+        generatedFileName: ''
+        docsFilePath: src/graphql
+        region: ap-northeast-1
+        apiId: 3iiwsjucjbhs7i3jkpczisho5y
+        maxDepth: 2
