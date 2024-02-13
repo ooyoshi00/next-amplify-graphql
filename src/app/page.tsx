@@ -1,95 +1,56 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
+import { useEffect, useState } from 'react';
+import { getAllTodos } from '@/src/libs/graphql';
+import { Todo } from '@/src/API';
+import { Box, Container } from '@chakra-ui/react';
+import React from 'react';
+import { Header } from '../_components/Header';
+import { TodoList } from '../_components/TodoList';
+import { NoTodo } from '../_components/NoTodo';
+import { Loading } from '../_components/Loading';
+import { AddTodo } from '../_components/AddTodo';
+import { Amplify } from 'aws-amplify';
+
+Amplify.configure({
+	API: {
+		GraphQL: {
+			endpoint: process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT as string,
+			region: 'ap-northeast-1',
+			apiKey: process.env.NEXT_PUBLIC_API_KEY,
+			defaultAuthMode: 'apiKey',
+		},
+	},
+});
 
 export default function Home() {
-  return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+	const [todos, setTodos] = useState<Todo[]>([]);
+	const [isLoading, setIsLoading] = useState<boolean>(true);
+	useEffect(() => {
+		(async () => {
+			const res = await getAllTodos().catch((e) => {
+				console.log(e);
+				return [];
+			});
+			setTodos(res);
+			setIsLoading(false);
+		})();
+	}, []);
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  );
+	return (
+		<Box>
+			<Header />
+			<Container py={4}>
+				<Box>
+					{todos.map((todo: Todo) => (
+						<React.Fragment key={todo.id}>
+							<TodoList todo={todo} setTodos={setTodos} setIsLoading={setIsLoading} />
+						</React.Fragment>
+					))}
+					{todos.length === 0 && !isLoading && <NoTodo />}
+				</Box>
+			</Container>
+			<AddTodo setTodos={setTodos} setIsLoading={setIsLoading} />
+			<Loading isLoading={isLoading} />
+		</Box>
+	);
 }

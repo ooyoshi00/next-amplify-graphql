@@ -9,7 +9,6 @@ graphqlでToDoアプリを作ってみる
 - Appsync
 - DynamoDB
 
-
 ## 起動
 
 ```bash
@@ -17,3 +16,8 @@ npm install_
 npm run dev
 
 ```
+
+## 参考
+
+- https://github.com/yuikoito/graphql-nextjs-todo-app
+    - フロントエンド部分はほとんどこちらから抜粋しました(感謝)
